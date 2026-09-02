@@ -1,0 +1,412 @@
+FeeQuote demo prompts (Java). Open this in a plain text editor on the monitor you do not share
+(TextEdit on macOS, Notepad on Windows), not in the demo VS Code window.
+This file lives in ~/demos/demo-kit, outside the repository, so agents never read it and resets never touch it. Expected answers are in DEMO_SCRIPT.md, not here.
+Paste exactly what is between the dashed lines. Paths assume ~/demos/java-feequote.
+Where an entry says (macOS and Linux) or (Windows), paste only the one for your system; everything else is the same on all three.
+
+==============================================================================
+DAY BEFORE AND ONE HOUR BEFORE
+==============================================================================
+
+# Terminal, repository folder: first-time setup, day before (macOS and Linux)
+----------------------------------------
+bash ../demo-kit/java-feequote/setup-demo.sh
+----------------------------------------
+
+# Terminal, repository folder: first-time setup, day before (Windows)
+----------------------------------------
+..\demo-kit\java-feequote\setup-demo.ps1
+----------------------------------------
+
+# Terminal: warm the Maven cache (then check that `java -version` reports 25)
+----------------------------------------
+./mvnw -q test
+----------------------------------------
+
+# Terminal: check everything is green (the last line builds target/feequote.jar)
+----------------------------------------
+./mvnw test
+./mvnw -q checkstyle:check
+./mvnw -q clean compile
+./mvnw -q package -DskipTests
+----------------------------------------
+
+# Terminal: FULL reset (between rehearsals and one hour before; undo VS Code edits and /exit every Copilot session first)
+----------------------------------------
+git worktree remove --force ../feequote-lower
+git worktree remove --force ../feequote-higher
+git checkout -q -f main && git reset -q --hard v0.2.0 && git clean -fdq -e target
+git branch -f demo-checks demo-checks-base
+git checkout -q -B demo-start v0.1.0
+./mvnw -q dependency:go-offline
+git status --short
+git worktree list
+./mvnw -q test; ./mvnw -q checkstyle:check; ./mvnw -q clean compile
+----------------------------------------
+
+# Terminal: 4.3 worktrees (after the full reset)
+----------------------------------------
+git worktree add --detach ../feequote-lower demo-start
+git worktree add --detach ../feequote-higher demo-start
+----------------------------------------
+
+# 4.3 LEFT terminal, lower tier. Then `copilot --allow-all-tools`, trust the folder, /model lower tier
+----------------------------------------
+cd ~/demos/feequote-lower
+./mvnw -q test
+----------------------------------------
+
+# 4.3 RIGHT terminal, higher tier. Then `copilot --allow-all-tools`, trust the folder, /model higher tier
+----------------------------------------
+cd ~/demos/feequote-higher
+./mvnw -q test
+----------------------------------------
+
+==============================================================================
+LIVE RESET (ten minutes before, before run A, before run B)
+==============================================================================
+
+# Terminal, repository folder
+----------------------------------------
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq -e target
+----------------------------------------
+
+==============================================================================
+4.2 CONTEXT WINDOW (branch demo-start)
+==============================================================================
+
+# Before you start. Terminal: the live reset (VS Code open, no editors open)
+----------------------------------------
+cd ~/demos/java-feequote
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq -e target
+git status --short
+----------------------------------------
+
+# Step 1. VS Code chat, Agent mode
+----------------------------------------
+#file:README.md #file:src/main/java/com/feequote/core/Pricing.java #file:src/main/java/com/feequote/legacy/Fees.java #file:src/main/java/com/feequote/services/TransferService.java #file:src/test/java/com/feequote/services/TransferServiceTest.java
+Which fee helper should new code call, and why? Answer from the code, not the README.
+----------------------------------------
+
+# Step 2. In your terminal app: `copilot`, trust the folder, /model higher tier. Then paste
+----------------------------------------
+@README.md @src/main/java/com/feequote/core/Pricing.java @src/main/java/com/feequote/legacy/Fees.java @src/main/java/com/feequote/services/TransferService.java @src/test/java/com/feequote/services/TransferServiceTest.java
+Read these files. For the rest of this session, end every answer with a final line that starts with "Sources:" and lists the files you used. For now, just reply OK.
+----------------------------------------
+
+# Step 2. CLI
+----------------------------------------
+/context
+----------------------------------------
+
+# Step 2. CLI (first ask attendees the Sources: prediction; they answer in chat)
+----------------------------------------
+/compact
+----------------------------------------
+
+# Step 2. CLI
+----------------------------------------
+/context
+----------------------------------------
+
+# Step 2. CLI follow-up: check the last line for Sources:
+----------------------------------------
+Which tests fail if new code calls the legacy fee helper instead of core pricing?
+----------------------------------------
+
+# Step 2. CLI, then
+----------------------------------------
+/exit
+----------------------------------------
+
+# Optional extra prompt (VS Code or CLI)
+----------------------------------------
+Where is the domestic fee cap defined, and which tests cover it?
+----------------------------------------
+
+# Optional extra prompt (VS Code or CLI)
+----------------------------------------
+Walk me through how a quote is assembled, one file at a time, without proposing any changes.
+----------------------------------------
+
+==============================================================================
+4.3 MODEL TIER (the two worktree terminals)
+==============================================================================
+
+# Step 1. Paste into BOTH sessions, lower tier first
+----------------------------------------
+Add retry with exponential backoff to the payment client submit path
+----------------------------------------
+
+# Step 2. Both sessions, after each run finishes (how to read the result: DEMO_SCRIPT.md, segment 4.3 Step 2)
+----------------------------------------
+!cp ../demo-kit/java-feequote/tier-check/PaymentClientTierCheckTest.java src/test/java/com/feequote/clients/ && ./mvnw -q test -Dtest=PaymentClientTierCheckTest
+----------------------------------------
+
+# Step 2. Both sessions
+----------------------------------------
+/usage
+----------------------------------------
+
+# Step 3 (optional). Lower-tier session: discard first (also undoes a commit)
+----------------------------------------
+!git reset -q --hard demo-start && git clean -fdq -e target
+----------------------------------------
+
+# Step 3 (optional). Lower-tier session
+----------------------------------------
+Rename `computeFee` to `domesticFee` across the code and tests, keep a deprecated alias for one release
+----------------------------------------
+
+# Run it again. Both sessions: reset the worktree (also undoes a commit), then /clear, check /model, back to Step 1
+----------------------------------------
+!git reset -q --hard demo-start && git clean -fdq -e target
+----------------------------------------
+
+# Run it again. Both sessions
+----------------------------------------
+/clear
+----------------------------------------
+
+# Step 4. Both sessions, then stop any Maven or java process from either worktree and close both terminals
+----------------------------------------
+/exit
+----------------------------------------
+
+==============================================================================
+4.5 RUN A AND RUN B (branch demo-start, higher tier for both)
+==============================================================================
+
+# Before run A: both 4.3 sessions closed. Open a VS Code Plan chat with the higher tier and leave it ready. Then, in your terminal app, the live reset and the CLI. In the session: Shift+Tab to standard mode, /model higher tier.
+----------------------------------------
+cd ~/demos/java-feequote
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq -e target
+git status --short
+copilot
+----------------------------------------
+
+# Run A. CLI session: the feature prompt (the same text goes into the Plan chat for run B)
+----------------------------------------
+Add support for international transfers. A transfer is international when the destination country differs from the origin country. International transfers incur an additional FX fee of 50 basis points of the amount, subject to the same minimum, cap, and rounding policy as the domestic fee. The quote must show the FX fee as its own line in the breakdown and include it in the total. Acceptance examples: a 247100 cent international transfer quotes a domestic fee of 2224, an FX fee of 1236, and a total fee of 3460. A 1000000 cent international transfer quotes 2500 domestic, 2500 FX, total 5000. A domestic transfer is unchanged. Add tests for these examples and run the full test suite.
+----------------------------------------
+
+# Run A. CLI, when it finishes: build the jar (macOS and Linux)
+----------------------------------------
+!./mvnw -q package -DskipTests
+----------------------------------------
+
+# Run A. CLI, when it finishes: build the jar (Windows)
+----------------------------------------
+!.\mvnw.cmd -q package -DskipTests
+----------------------------------------
+
+# Run A. CLI: check the total (expected values: DEMO_SCRIPT.md, segment 4.5)
+----------------------------------------
+!java -jar target/feequote.jar quote --amount=247100 --from=AU --to=NZ
+----------------------------------------
+
+# Run A. CLI
+----------------------------------------
+/usage
+----------------------------------------
+
+# Run A. Then
+----------------------------------------
+/exit
+----------------------------------------
+
+# Run A. Same terminal, BEFORE the live reset: print run A's numbers (macOS and Linux)
+----------------------------------------
+python3 ../demo-kit/run-stats.py
+----------------------------------------
+
+# Run A. Same terminal, BEFORE the live reset: print run A's numbers (Windows)
+----------------------------------------
+py ..\demo-kit\run-stats.py
+----------------------------------------
+
+# Before run B. Same terminal: the live reset
+----------------------------------------
+cd ~/demos/java-feequote
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq -e target
+git status --short
+----------------------------------------
+
+# Run B. After the live reset above and View: Close All Editors, paste the feature prompt above into the Plan chat. If the plan picks the wrong helper, use the one-line correction in DEMO_SCRIPT.md, segment 4.5 Step 2. When it finishes, in the VS Code terminal:
+----------------------------------------
+./mvnw -q package -DskipTests
+java -jar target/feequote.jar quote --amount=247100 --from=AU --to=NZ
+----------------------------------------
+
+# Run B. VS Code terminal, BEFORE the 4.7 reset: print run B's numbers (macOS and Linux)
+----------------------------------------
+python3 ../demo-kit/run-stats.py --vscode
+----------------------------------------
+
+# Run B. VS Code terminal, BEFORE the 4.7 reset: print run B's numbers (Windows)
+----------------------------------------
+py ..\demo-kit\run-stats.py --vscode
+----------------------------------------
+
+==============================================================================
+4.7 GUARDRAILS (branch demo-checks, then main)
+==============================================================================
+
+# Before you start. In VS Code: Undo run B's edits, View: Close All Editors. Then terminal, repository folder:
+----------------------------------------
+git checkout -q -f main && git reset -q --hard v0.2.0 && git clean -fdq -e target
+git checkout -q -f demo-checks
+git status --short
+----------------------------------------
+
+# Before you start. Terminal: start the session, then /model higher tier (macOS and Linux)
+----------------------------------------
+copilot --allow-tool "shell(./mvnw:*)" --allow-tool "shell(mvnw:*)"
+----------------------------------------
+
+# Before you start. Terminal: start the session, then /model higher tier (Windows)
+----------------------------------------
+copilot --allow-tool "shell(./mvnw:*)" --allow-tool "shell(mvnw:*)" --allow-tool "shell(.\mvnw.cmd:*)" --allow-tool "shell(mvnw.cmd:*)"
+----------------------------------------
+
+# Step 1. CLI (macOS and Linux)
+----------------------------------------
+!./mvnw test
+----------------------------------------
+
+# Step 1. CLI (Windows)
+----------------------------------------
+!.\mvnw.cmd test
+----------------------------------------
+
+# Step 1. CLI
+----------------------------------------
+!git --no-pager show HEAD
+----------------------------------------
+
+# Step 2. CLI
+----------------------------------------
+Run every check listed in AGENTS.md and fix whatever they report. Do not change any tests.
+----------------------------------------
+
+# Step 2 fallback if the agent stops without the Checkstyle details (macOS and Linux)
+----------------------------------------
+!./mvnw checkstyle:check
+----------------------------------------
+
+# Step 2 fallback if the agent stops without the Checkstyle details (Windows)
+----------------------------------------
+!.\mvnw.cmd checkstyle:check
+----------------------------------------
+
+# Step 2. CLI: discard the fix and move to main
+----------------------------------------
+!git checkout -q -f main
+----------------------------------------
+
+# Step 2. CLI: end the session
+----------------------------------------
+/exit
+----------------------------------------
+
+# Step 2. Same terminal: start a fresh session (macOS and Linux), then /model higher tier
+----------------------------------------
+copilot --allow-tool "shell(./mvnw:*)" --allow-tool "shell(mvnw:*)"
+----------------------------------------
+
+# Step 2. Same terminal: start a fresh session (Windows), then /model higher tier
+----------------------------------------
+copilot --allow-tool "shell(./mvnw:*)" --allow-tool "shell(mvnw:*)" --allow-tool "shell(.\mvnw.cmd:*)" --allow-tool "shell(mvnw.cmd:*)"
+----------------------------------------
+
+# Step 3. CLI (first ask attendees the run-the-tests prediction; they answer in chat). Leave the change uncommitted.
+----------------------------------------
+Change the domestic cap to 3000 cents and update everything that depends on it
+----------------------------------------
+
+# Fallback if the agent does not run the tests (CLI)
+----------------------------------------
+Is this task complete?
+----------------------------------------
+
+# Fallback if it still does not (CLI, macOS and Linux)
+----------------------------------------
+!./mvnw -q test
+----------------------------------------
+
+# Fallback if it still does not (CLI, Windows)
+----------------------------------------
+!.\mvnw.cmd -q test
+----------------------------------------
+
+# Step 5. CLI, then /exit
+----------------------------------------
+/chronicle improve
+----------------------------------------
+
+==============================================================================
+4.9 AGENTS, SKILL, MCP, SUBAGENT (branch main, cap change uncommitted)
+==============================================================================
+
+# Before you start. The LEFT terminal stays a plain terminal in the repository folder. In a new RIGHT terminal beside it, then /model higher tier
+----------------------------------------
+cd ~/demos/java-feequote
+copilot
+----------------------------------------
+
+# Step 1. VS Code, new chat, Agent mode (do not wait)
+----------------------------------------
+Use a subagent for this so the file contents stay out of this chat. Survey every class that reads the domestic fee policy and report where a per-channel policy would have to be threaded through. Do not edit anything; produce a findings list with file and line references.
+----------------------------------------
+
+# Step 2. VS Code, new chat, agent picker: reviewer
+----------------------------------------
+Review the uncommitted change to the domestic cap in src/main/java/com/feequote/core/Pricing.java and the tests that cover it
+----------------------------------------
+
+# Step 2. LEFT terminal, straight away
+----------------------------------------
+copilot --agent reviewer -p "Review the uncommitted change to the domestic cap in src/main/java/com/feequote/core/Pricing.java and the tests that cover it"
+----------------------------------------
+
+# Step 3. VS Code, new chat, Agent mode
+----------------------------------------
+Write release notes for v0.1.0 to v0.2.0
+----------------------------------------
+
+# Step 3 fallback if the skill does not fire
+----------------------------------------
+Use the release-notes skill to write release notes for v0.1.0 to v0.2.0.
+----------------------------------------
+
+# Step 5. RIGHT terminal (after showing the reviewer output in the left terminal)
+----------------------------------------
+/mcp show
+----------------------------------------
+
+# Step 5. RIGHT terminal (sixty seconds; skip if running long). Leave the session open.
+----------------------------------------
+Using the GitHub MCP server, list the five most recent open pull requests on github/awesome-copilot and summarize each in one line.
+----------------------------------------
+
+==============================================================================
+4.10 POWER-USER TIPS (branch main)
+==============================================================================
+
+# Step 1: RIGHT terminal, prompt box empty (Esc clears it), press Ctrl+O, then Ctrl+T (Ctrl on macOS too).
+# Step 2 (only if on time): open a collapsed tool call group in the VS Code survey chat.
+# Step 3: type /exit in the right terminal, then in the LEFT terminal, first the question yourself:
+----------------------------------------
+git grep -n computeFee -- src
+----------------------------------------
+
+# Step 3. LEFT terminal: the same question to a headless agent (read its AI Credits line)
+----------------------------------------
+copilot -p "Using git grep, list every caller of computeFee" --allow-tool "shell(git:*)"
+----------------------------------------
+
+# Fallback if a tool is denied (LEFT terminal)
+----------------------------------------
+copilot -p "Using git grep, list every caller of computeFee" --allow-tool "shell(git:*)" --allow-tool "read"
+----------------------------------------
+

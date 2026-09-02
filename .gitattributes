@@ -1,0 +1,5 @@
+# The demo repositories run on macOS, Linux and Windows: keep scripts LF everywhere.
+*.sh text eol=lf
+mvnw text eol=lf
+*.mjs text eol=lf
+*.cmd text eol=crlf

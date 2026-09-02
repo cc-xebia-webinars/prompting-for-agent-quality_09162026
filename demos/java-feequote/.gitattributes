@@ -1,0 +1,4 @@
+# Shell scripts must keep LF endings or bash on Windows (Git Bash, WSL) rejects them.
+*.sh text eol=lf
+mvnw text eol=lf
+*.cmd text eol=crlf

@@ -1,0 +1,490 @@
+FeeQuote demo prompts (ASP.NET Core MVC + React). Open this in a plain text editor on the monitor you do not share
+(TextEdit on macOS, Notepad on Windows), not in the demo VS Code window.
+This file lives in ~/demos/demo-kit, outside the repository, so agents never read it and resets never touch it. Expected answers are in DEMO_SCRIPT.md, not here.
+Paste exactly what is between the dashed lines. Paths assume ~/demos/aspnet-react-feequote.
+Where an entry says (macOS and Linux) or (Windows), paste only the one for your system; everything else is the same on all three.
+
+==============================================================================
+DAY BEFORE AND ONE HOUR BEFORE
+==============================================================================
+
+# Terminal, repository folder: first-time setup, day before (macOS and Linux)
+----------------------------------------
+cd src/FeeQuote.Web/ClientApp
+npm ci
+cd ../../..
+bash ../demo-kit/aspnet-react-feequote/setup-demo.sh
+dotnet restore
+cd src/FeeQuote.Web/ClientApp
+npm run build
+cd ../../..
+----------------------------------------
+
+# Terminal, repository folder: first-time setup, day before (Windows)
+----------------------------------------
+cd src/FeeQuote.Web/ClientApp
+npm ci
+cd ../../..
+..\demo-kit\aspnet-react-feequote\setup-demo.ps1
+dotnet restore
+cd src/FeeQuote.Web/ClientApp
+npm run build
+cd ../../..
+----------------------------------------
+
+# Terminal: check everything is green
+----------------------------------------
+dotnet test
+dotnet format --verify-no-changes
+dotnet build -warnaserror
+npm --prefix src/FeeQuote.Web/ClientApp run check
+----------------------------------------
+
+# Terminal: start the site, open http://localhost:5080/app/, get one quote, then stop it with Ctrl+C
+----------------------------------------
+dotnet run --project src/FeeQuote.Web
+----------------------------------------
+
+# Terminal: FULL reset (between rehearsals and one hour before; undo VS Code edits, /exit every Copilot session and stop the site first)
+----------------------------------------
+git worktree remove --force ../feequote-lower
+git worktree remove --force ../feequote-higher
+git checkout -q -f main && git reset -q --hard v0.2.0 && git clean -fdq
+git branch -f demo-checks demo-checks-base
+git checkout -q -B demo-start v0.1.0
+dotnet restore
+npm --prefix src/FeeQuote.Web/ClientApp ci
+git status --short
+git worktree list
+dotnet test; dotnet format --verify-no-changes; dotnet build -warnaserror
+npm --prefix src/FeeQuote.Web/ClientApp run check
+----------------------------------------
+
+# Terminal: 4.3 worktrees (after the full reset)
+----------------------------------------
+git worktree add --detach ../feequote-lower demo-start
+git worktree add --detach ../feequote-higher demo-start
+----------------------------------------
+
+# 4.3 LEFT terminal, lower tier. Then `copilot --allow-all-tools`, trust the folder, /model lower tier
+----------------------------------------
+cd ~/demos/feequote-lower
+dotnet build
+----------------------------------------
+
+# 4.3 RIGHT terminal, higher tier. Then `copilot --allow-all-tools`, trust the folder, /model higher tier
+----------------------------------------
+cd ~/demos/feequote-higher
+dotnet build
+----------------------------------------
+
+# 4.3 optional, in each worktree terminal, only if you want a run that decides to run the ClientApp checks to succeed
+----------------------------------------
+npm --prefix src/FeeQuote.Web/ClientApp ci
+----------------------------------------
+
+==============================================================================
+LIVE RESET (ten minutes before, before run A, before run B; stop the site first)
+==============================================================================
+
+# Terminal, repository folder
+----------------------------------------
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq
+----------------------------------------
+
+==============================================================================
+4.2 CONTEXT WINDOW (branch demo-start)
+==============================================================================
+
+# Before you start. Terminal: the live reset (VS Code open, no editors open) - stop the site first if it is running
+----------------------------------------
+cd ~/demos/aspnet-react-feequote
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq
+git status --short
+----------------------------------------
+
+# Step 1. VS Code chat, Agent mode
+----------------------------------------
+#file:README.md #file:src/FeeQuote.Web/Domain/Core/Pricing.cs #file:src/FeeQuote.Web/Domain/Legacy/Fees.cs #file:src/FeeQuote.Web/Domain/Services/TransferService.cs #file:tests/FeeQuote.Web.Tests/TransferServiceTests.cs
+Which fee helper should new code call, and why? Answer from the code, not the README.
+----------------------------------------
+
+# Step 2. In your terminal app: `copilot`, trust the folder, /model higher tier. Then paste
+----------------------------------------
+@README.md @src/FeeQuote.Web/Domain/Core/Pricing.cs @src/FeeQuote.Web/Domain/Legacy/Fees.cs @src/FeeQuote.Web/Domain/Services/TransferService.cs @tests/FeeQuote.Web.Tests/TransferServiceTests.cs
+Read these files. For the rest of this session, end every answer with a final line that starts with "Sources:" and lists the files you used. For now, just reply OK.
+----------------------------------------
+
+# Step 2. CLI
+----------------------------------------
+/context
+----------------------------------------
+
+# Step 2. CLI (first ask attendees the Sources: prediction; they answer in chat)
+----------------------------------------
+/compact
+----------------------------------------
+
+# Step 2. CLI
+----------------------------------------
+/context
+----------------------------------------
+
+# Step 2. CLI follow-up: check the last line for Sources:
+----------------------------------------
+Which tests fail if new code calls the legacy fee helper instead of core pricing?
+----------------------------------------
+
+# Step 2. CLI, then
+----------------------------------------
+/exit
+----------------------------------------
+
+# Optional extra prompt (VS Code or CLI)
+----------------------------------------
+Where is the domestic fee cap defined, and which tests cover it?
+----------------------------------------
+
+# Optional extra prompt (VS Code or CLI)
+----------------------------------------
+Walk me through how a quote is assembled, one file at a time, without proposing any changes.
+----------------------------------------
+
+==============================================================================
+4.3 MODEL TIER (the two worktree terminals)
+==============================================================================
+
+# Step 1. Paste into BOTH sessions, lower tier first
+----------------------------------------
+Add retry with exponential backoff to the payment client submit path
+----------------------------------------
+
+# Step 2. Both sessions, after each run finishes (how to read the result: DEMO_SCRIPT.md, segment 4.3 Step 2)
+----------------------------------------
+!cp ../demo-kit/aspnet-react-feequote/tier-check/TierCheckTests.cs tests/FeeQuote.Web.Tests/ && dotnet test --filter-class FeeQuote.Web.Tests.TierCheckTests
+----------------------------------------
+
+# Step 2. Both sessions
+----------------------------------------
+/usage
+----------------------------------------
+
+# Step 3 (optional). Lower-tier session: discard first (also undoes a commit)
+----------------------------------------
+!git reset -q --hard demo-start && git clean -fdq
+----------------------------------------
+
+# Step 3 (optional). Lower-tier session
+----------------------------------------
+Rename `ComputeFee` to `DomesticFee` across the code and tests, keep a deprecated alias for one release
+----------------------------------------
+
+# Run it again. Both sessions: reset the worktree (also undoes a commit), then /clear, check /model, back to Step 1
+----------------------------------------
+!git reset -q --hard demo-start && git clean -fdq
+----------------------------------------
+
+# Run it again. Both sessions
+----------------------------------------
+/clear
+----------------------------------------
+
+# Step 4. Both sessions, then close both terminals
+----------------------------------------
+/exit
+----------------------------------------
+
+==============================================================================
+4.5 RUN A AND RUN B (branch demo-start, higher tier for both)
+==============================================================================
+
+# Before run A: both 4.3 sessions closed. Open a VS Code Plan chat with the higher tier and leave it ready. Then, in your terminal app, the live reset and the CLI. In the session: Shift+Tab to standard mode, /model higher tier.
+----------------------------------------
+cd ~/demos/aspnet-react-feequote
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq
+git status --short
+copilot
+----------------------------------------
+
+# Run A. CLI session: the feature prompt (the same text goes into the Plan chat for run B)
+----------------------------------------
+Add support for international transfers. A transfer is international when the destination country differs from the origin country. International transfers incur an additional FX fee of 50 basis points of the amount, subject to the same minimum, cap, and rounding policy as the domestic fee. The quote must show the FX fee as its own line in the breakdown and include it in the total. Acceptance examples: a 247100 cent international transfer quotes a domestic fee of 2224, an FX fee of 1236, and a total fee of 3460. A 1000000 cent international transfer quotes 2500 domestic, 2500 FX, total 5000. A domestic transfer is unchanged. Add tests for these examples and run the full test suite.
+----------------------------------------
+
+# Run A, when it finishes. In a SECOND terminal in the repository folder, start the site and wait for `Now listening on: http://localhost:5080`
+----------------------------------------
+dotnet run --project src/FeeQuote.Web
+----------------------------------------
+
+# Run A. CLI: check the quote (macOS and Linux). Expected values: DEMO_SCRIPT.md, segment 4.5. Then stop the site with Ctrl+C
+----------------------------------------
+!curl -s -X POST http://localhost:5080/api/quotes -H "Content-Type: application/json" -d '{"amountCents":247100,"currency":"AUD","originCountry":"AU","destinationCountry":"NZ","channel":"online"}'
+----------------------------------------
+
+# Run A. CLI: check the quote (Windows). Expected values: DEMO_SCRIPT.md, segment 4.5. Then stop the site with Ctrl+C
+----------------------------------------
+!Invoke-RestMethod -Method Post -Uri http://localhost:5080/api/quotes -ContentType application/json -Body '{"amountCents":247100,"currency":"AUD","originCountry":"AU","destinationCountry":"NZ","channel":"online"}' | ConvertTo-Json -Depth 5
+----------------------------------------
+
+# Run A. CLI
+----------------------------------------
+/usage
+----------------------------------------
+
+# Run A. Then
+----------------------------------------
+/exit
+----------------------------------------
+
+# Run A. Same terminal, BEFORE the live reset: print run A's numbers (macOS and Linux)
+----------------------------------------
+python3 ../demo-kit/run-stats.py
+----------------------------------------
+
+# Run A. Same terminal, BEFORE the live reset: print run A's numbers (Windows)
+----------------------------------------
+py ..\demo-kit\run-stats.py
+----------------------------------------
+
+# Before run B. Same terminal: the live reset (stop the site with Ctrl+C first if it is running)
+----------------------------------------
+cd ~/demos/aspnet-react-feequote
+git checkout -q -f demo-start && git reset -q --hard v0.1.0 && git clean -fdq
+git status --short
+----------------------------------------
+
+# Run B. After the live reset above and View: Close All Editors, paste the feature prompt above into the Plan chat. If the plan picks the wrong helper, use the one-line correction in DEMO_SCRIPT.md, segment 4.5 Step 2. When it finishes, start the site in a second terminal:
+----------------------------------------
+dotnet run --project src/FeeQuote.Web
+----------------------------------------
+
+# Run B. VS Code terminal: check the quote (macOS and Linux), then stop the site with Ctrl+C
+----------------------------------------
+curl -s -X POST http://localhost:5080/api/quotes -H "Content-Type: application/json" -d '{"amountCents":247100,"currency":"AUD","originCountry":"AU","destinationCountry":"NZ","channel":"online"}'
+----------------------------------------
+
+# Run B. VS Code terminal: check the quote (Windows), then stop the site with Ctrl+C
+----------------------------------------
+Invoke-RestMethod -Method Post -Uri http://localhost:5080/api/quotes -ContentType application/json -Body '{"amountCents":247100,"currency":"AUD","originCountry":"AU","destinationCountry":"NZ","channel":"online"}' | ConvertTo-Json -Depth 5
+----------------------------------------
+
+# Run B. VS Code terminal, BEFORE the 4.7 reset: print run B's numbers (macOS and Linux)
+----------------------------------------
+python3 ../demo-kit/run-stats.py --vscode
+----------------------------------------
+
+# Run B. VS Code terminal, BEFORE the 4.7 reset: print run B's numbers (Windows)
+----------------------------------------
+py ..\demo-kit\run-stats.py --vscode
+----------------------------------------
+
+==============================================================================
+4.7 GUARDRAILS (branch demo-checks, then main)
+==============================================================================
+
+# Before you start. In VS Code: Undo run B's edits, View: Close All Editors. Site stopped. Then terminal, repository folder:
+----------------------------------------
+git checkout -q -f main && git reset -q --hard v0.2.0 && git clean -fdq
+git checkout -q -f demo-checks
+git status --short
+----------------------------------------
+
+# Before you start. Terminal: start the session, then /model higher tier
+----------------------------------------
+copilot --allow-tool "shell(dotnet:*)" --allow-tool "shell(npm:*)"
+----------------------------------------
+
+# Step 1. CLI
+----------------------------------------
+!npm --prefix src/FeeQuote.Web/ClientApp test
+----------------------------------------
+
+# Step 1. CLI
+----------------------------------------
+!git --no-pager show HEAD
+----------------------------------------
+
+# Step 2. CLI
+----------------------------------------
+Run every check listed in AGENTS.md and fix whatever they report. Do not change any tests.
+----------------------------------------
+
+# Step 2. CLI: discard the fix and move to main
+----------------------------------------
+!git checkout -q -f main
+----------------------------------------
+
+# Step 2. CLI: end the session
+----------------------------------------
+/exit
+----------------------------------------
+
+# Step 2. Same terminal: start a fresh session, then /model higher tier
+----------------------------------------
+copilot --allow-tool "shell(dotnet:*)" --allow-tool "shell(npm:*)"
+----------------------------------------
+
+# Step 3. CLI (first ask attendees the run-the-tests prediction; they answer in chat). Leave the change uncommitted.
+----------------------------------------
+Change the domestic cap to 3000 cents and update everything that depends on it
+----------------------------------------
+
+# Fallback if the agent does not run the tests (CLI)
+----------------------------------------
+Is this task complete?
+----------------------------------------
+
+# Fallback if it still does not (CLI)
+----------------------------------------
+!dotnet test
+----------------------------------------
+
+# Step 5. CLI, then /exit
+----------------------------------------
+/chronicle improve
+----------------------------------------
+
+==============================================================================
+4.9 AGENTS, SKILL, MCP, SUBAGENT (branch main, cap change uncommitted)
+==============================================================================
+
+# Before you start. The LEFT terminal stays a plain terminal in the repository folder. In a new RIGHT terminal beside it, then /model higher tier
+----------------------------------------
+cd ~/demos/aspnet-react-feequote
+copilot
+----------------------------------------
+
+# Step 1. VS Code, new chat, Agent mode (do not wait)
+----------------------------------------
+Use a subagent for this so the file contents stay out of this chat. Survey every module that reads the domestic fee policy and report where a per-channel policy would have to be threaded through. Do not edit anything; produce a findings list with file and line references.
+----------------------------------------
+
+# Step 2. VS Code, new chat, agent picker: reviewer
+----------------------------------------
+Review the uncommitted change to the domestic cap in src/FeeQuote.Web/Domain/Core/Pricing.cs and the tests that cover it
+----------------------------------------
+
+# Step 2. LEFT terminal, straight away
+----------------------------------------
+copilot --agent reviewer -p "Review the uncommitted change to the domestic cap in src/FeeQuote.Web/Domain/Core/Pricing.cs and the tests that cover it"
+----------------------------------------
+
+# Step 3. VS Code, new chat, Agent mode
+----------------------------------------
+Write release notes for v0.1.0 to v0.2.0
+----------------------------------------
+
+# Step 3 fallback if the skill does not fire
+----------------------------------------
+Use the release-notes skill to write release notes for v0.1.0 to v0.2.0.
+----------------------------------------
+
+# Step 5. RIGHT terminal (after showing the reviewer output in the left terminal)
+----------------------------------------
+/mcp show
+----------------------------------------
+
+# Step 5. RIGHT terminal (sixty seconds; skip if running long). Leave the session open.
+----------------------------------------
+Using the GitHub MCP server, list the five most recent open pull requests on github/awesome-copilot and summarize each in one line.
+----------------------------------------
+
+==============================================================================
+4.10 POWER-USER TIPS (branch main)
+==============================================================================
+
+# Step 1: RIGHT terminal, prompt box empty (Esc clears it), press Ctrl+O, then Ctrl+T (Ctrl on macOS too).
+# Step 2 (only if on time): open a collapsed tool call group in the VS Code survey chat.
+# Step 3: type /exit in the right terminal, then in the LEFT terminal, first the question yourself:
+----------------------------------------
+git grep -n ComputeFee -- src tests
+----------------------------------------
+
+# Step 3. LEFT terminal: the same question to a headless agent (read its AI Credits line)
+----------------------------------------
+copilot -p "Using git grep, list every caller of ComputeFee" --allow-tool "shell(git:*)"
+----------------------------------------
+
+# Fallback if a tool is denied (LEFT terminal)
+----------------------------------------
+copilot -p "Using git grep, list every caller of ComputeFee" --allow-tool "shell(git:*)" --allow-tool "read"
+----------------------------------------
+
+==============================================================================
+TRY IT YOURSELF: PARALLEL SESSIONS (not part of the live session; full reset first)
+==============================================================================
+
+# Preparation, only if fx-fee does not exist yet: after a run that reached the correct result from a clean demo-start (checks in DEMO_SCRIPT.md), terminal, repository folder
+----------------------------------------
+git checkout -b fx-fee
+git add -A
+git commit -m "feat: add FX fee for international transfers"
+----------------------------------------
+
+# Preparation. Terminal, repository folder: one worktree per session
+----------------------------------------
+git worktree add -b fx-api ../feequote-api fx-fee
+git worktree add -b fx-ui ../feequote-ui fx-fee
+----------------------------------------
+
+# Preparation. Terminal, repository folder: ClientApp packages for the front-end worktree
+----------------------------------------
+npm --prefix ../feequote-ui/src/FeeQuote.Web/ClientApp ci
+----------------------------------------
+
+# Preparation. LEFT terminal, then `copilot`, trust the folder, /model
+----------------------------------------
+cd ~/demos/feequote-api
+----------------------------------------
+
+# Preparation. RIGHT terminal, then `copilot`, trust the folder, /model (a different model)
+----------------------------------------
+cd ~/demos/feequote-ui
+----------------------------------------
+
+# Step 1. feequote-api session
+----------------------------------------
+Expose the FX fee as `fxFeeCents` at the top level of the /api/quotes response in addition to the breakdown line, and add an integration test
+----------------------------------------
+
+# Step 1. feequote-ui session (at the same time)
+----------------------------------------
+Show the FX fee as its own row in the quote breakdown, styled like the other rows, and add a test
+----------------------------------------
+
+# Step 1. Both sessions, when they finish
+----------------------------------------
+/usage
+----------------------------------------
+
+# Step 1. feequote-ui session
+----------------------------------------
+Did you add fxFeeCents to QuoteResponse in api.ts?
+----------------------------------------
+
+# Step 2. feequote-api session
+----------------------------------------
+!git add -A && git commit -m "feat: expose fxFeeCents on the quotes API"
+----------------------------------------
+
+# Step 2. feequote-ui session, then /exit in both sessions
+----------------------------------------
+!git add -A && git commit -m "feat: show the FX fee row in the quote breakdown"
+----------------------------------------
+
+# Step 3. Terminal, repository folder: merge and check
+----------------------------------------
+git checkout fx-fee
+git merge --no-ff --no-edit fx-api
+git merge --no-ff --no-edit fx-ui
+dotnet test
+npm --prefix src/FeeQuote.Web/ClientApp run check
+----------------------------------------
+
+# Step 3. Terminal, repository folder: remove the worktrees and their branches
+----------------------------------------
+git worktree remove ../feequote-api
+git worktree remove ../feequote-ui
+git branch -d fx-api fx-ui
+----------------------------------------
+

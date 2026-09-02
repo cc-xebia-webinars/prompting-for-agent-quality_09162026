@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: feequote
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO

@@ -1,0 +1,21 @@
+# Dependencies and build output
+node_modules
+dist/
+coverage/
+*.tsbuildinfo
+.eslintcache
+
+# Other stacks' build and cache directories (kept out of this repository too)
+bin/
+obj/
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+*.log
+.idea/

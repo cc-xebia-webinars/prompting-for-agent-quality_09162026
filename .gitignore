@@ -1,0 +1,6 @@
+.DS_Store
+Thumbs.db
+
+# Dependency installs and build output created at the webinar repository root by
+# mistake. Each demo repository carries its own .gitignore for its own stack.
+node_modules/

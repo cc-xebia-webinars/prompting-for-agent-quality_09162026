@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+  <!--
+    The Spring Boot entry point holds only a static main, which reads as a utility
+    class, but Spring needs a public constructor to proxy the configuration class.
+    Every real utility class in this repository keeps its private constructor.
+  -->
+  <suppress checks="HideUtilityClassConstructor" files="FeeQuoteApplication\.java$"/>
+</suppressions>

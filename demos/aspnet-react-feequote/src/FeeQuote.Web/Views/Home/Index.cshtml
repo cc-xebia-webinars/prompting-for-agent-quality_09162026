@@ -1,0 +1,38 @@
+@{
+  ViewData["Title"] = "Transfer fee quotes";
+}
+
+<h1>FeeQuote</h1>
+<p>
+  FeeQuote prices customer payment transfers. Channels send a transfer
+  (amount, currency, origin and destination country) and receive a quote with
+  an itemised fee breakdown and the total to debit.
+</p>
+
+<h2>Try it</h2>
+<p>
+  The interactive quote form is a small React app served from
+  <a href="/app/">/app/</a>. It calls the same API that channel systems use.
+</p>
+
+<h2>API</h2>
+<p><code>POST /api/quotes</code> with a JSON body:</p>
+<pre><code>{
+  "amountCents": 123500,
+  "currency": "AUD",
+  "originCountry": "AU",
+  "destinationCountry": "AU",
+  "channel": "online"
+}</code></pre>
+<p>
+  The response carries <code>feeCents</code>, <code>totalCents</code> and a
+  <code>breakdown</code> array of labelled amounts, all in integer cents.
+</p>
+
+<h2>Reference data</h2>
+<dl>
+  <dt>Currencies</dt>
+  <dd>@ViewData["Currencies"]</dd>
+  <dt>Countries</dt>
+  <dd>@ViewData["Countries"]</dd>
+</dl>

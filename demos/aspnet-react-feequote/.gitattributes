@@ -1,0 +1,5 @@
+# Keep line endings stable across Windows and Unix checkouts so
+# "dotnet format --verify-no-changes" gives the same answer everywhere.
+* text=auto eol=lf
+*.png binary
+*.ico binary

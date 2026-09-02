@@ -1,0 +1,36 @@
+# Build output
+bin/
+obj/
+out/
+dist/
+*.dll
+*.pdb
+*.exe
+
+# Test and coverage output
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.coveragexml
+
+# IDE and tooling state
+.vs/
+.idea/
+*.user
+*.suo
+*.swp
+*.DotSettings.user
+.vscode/*
+!.vscode/mcp.json
+!.vscode/settings.json
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# OS files
+.DS_Store
+Thumbs.db

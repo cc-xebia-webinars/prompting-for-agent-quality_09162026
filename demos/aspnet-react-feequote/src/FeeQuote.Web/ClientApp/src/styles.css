@@ -1,0 +1,86 @@
+:root {
+  --ink: #1f2933;
+  --muted: #52606d;
+  --accent: #b31b1b;
+  --line: #d9dee3;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.quote {
+  max-width: 32rem;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.quote form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.quote label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.quote input,
+.quote select {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.quote button {
+  justify-self: start;
+  padding: 0.5rem 1.25rem;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.quote button:disabled {
+  opacity: 0.6;
+}
+
+.error {
+  color: var(--accent);
+}
+
+.breakdown {
+  width: 100%;
+  margin-top: 1.5rem;
+  border-collapse: collapse;
+}
+
+.breakdown th,
+.breakdown td {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.breakdown td {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.breakdown .fee-line th {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.breakdown .total th,
+.breakdown .total td {
+  font-weight: 700;
+  border-bottom: 0;
+}

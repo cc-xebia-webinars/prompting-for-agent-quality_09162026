@@ -1,0 +1,28 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+
+# Node / Vite
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+
+# React build output, produced by "npm run build" in ClientApp
+src/FeeQuote.Web/wwwroot/app/
+
+# Local tooling caches
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db

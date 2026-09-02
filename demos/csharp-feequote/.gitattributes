@@ -1,0 +1,5 @@
+# Keep line endings stable across Windows, macOS and Linux checkouts so
+# "dotnet format --verify-no-changes" gives the same answer everywhere.
+* text=auto eol=lf
+# Shell scripts must keep LF endings or bash on Windows (Git Bash, WSL) rejects them.
+*.sh text eol=lf
